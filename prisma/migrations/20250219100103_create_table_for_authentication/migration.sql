@@ -21,6 +21,17 @@ CREATE TABLE "users" (
 );
 
 -- CreateTable
+CREATE TABLE "RefreshToken" (
+    "id" TEXT NOT NULL,
+    "token" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "expiresAt" TIMESTAMP(3) NOT NULL,
+    "userId" TEXT NOT NULL,
+
+    CONSTRAINT "RefreshToken_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "otp" (
     "id" TEXT NOT NULL,
     "code" VARCHAR(6) NOT NULL,
@@ -59,6 +70,12 @@ CREATE UNIQUE INDEX "users_username_key" ON "users"("username");
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "RefreshToken_token_key" ON "RefreshToken"("token");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "RefreshToken_userId_key" ON "RefreshToken"("userId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "personal_infos_userId_key" ON "personal_infos"("userId");
 
 -- CreateIndex
@@ -69,6 +86,9 @@ CREATE UNIQUE INDEX "password_reset_requests_token_key" ON "password_reset_reque
 
 -- CreateIndex
 CREATE UNIQUE INDEX "password_reset_requests_userId_key" ON "password_reset_requests"("userId");
+
+-- AddForeignKey
+ALTER TABLE "RefreshToken" ADD CONSTRAINT "RefreshToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "otp" ADD CONSTRAINT "otp_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
