@@ -1,4 +1,4 @@
-import { RegisterSchema } from "@/auth";
+import { RegisterSchema } from "@/schema/auth";
 import { generateUsername, hashPassword } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";

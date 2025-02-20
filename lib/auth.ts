@@ -3,30 +3,24 @@ import jwt from "jsonwebtoken"
 import { nanoid } from "nanoid";
 import { hash, compare } from "bcrypt-ts"
 import { db } from "@/lib/db"
+import { NextResponse } from "next/server";
 
 const ACCESS_SECRET = process.env.ACCESS_SECRET as string
 const REFRESH_SECRET = process.env.REFRESH_SECRET as string
 
 // durasi token
-const ACCESS_TOKEN_EXPIRY = "1h"; 
-const REFRESH_TOKEN_EXPIRY = "7d";
+const ACCESS_TOKEN_EXPIRY =  60 * 60; // 1 hour 
+const REFRESH_TOKEN_EXPIRY = 60 * 60 * 24 * 7 // 1 week
 
 
 // access token
 export const createToken = (user: User) => {
-    return jwt.sign({
-        userId: user.id,
- 
-    }, ACCESS_SECRET, {expiresIn: ACCESS_TOKEN_EXPIRY})
+    return jwt.sign( {userId: user.id }, ACCESS_SECRET)
 }
 
 // refresh token
 export const createRefreshToken = (user: User) => {
-    return jwt.sign(
-        {userId: user.id},
-        REFRESH_SECRET, 
-        { expiresIn: REFRESH_TOKEN_EXPIRY }
-    )
+    return jwt.sign( {userId: user.id}, REFRESH_SECRET)
 }
 
 // validation access token
@@ -70,4 +64,23 @@ export const hashPassword = async (password: string): Promise<string> => {
 // validation password
 export const verifyPassword = async (password: string, hashedPassword: string): Promise<boolean> => {
     return await compare(password, hashedPassword)
+}
+
+// set cookies
+export const setAuthCookies = (response: NextResponse, token: string, refreshToken: string) => {
+    response.cookies.set("SESSION_ID", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: ACCESS_TOKEN_EXPIRY,
+        path: "/"
+    })
+
+    response.cookies.set("SESSION_REFRESH", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: REFRESH_TOKEN_EXPIRY,
+        path: "/"
+    })
 }

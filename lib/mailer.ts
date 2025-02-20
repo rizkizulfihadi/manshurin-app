@@ -22,19 +22,24 @@ export const sendOtp = async (email: string, otp: string) => {
         `<div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
             <h2 style="text-align: center; color: #333;">Verifikasi OTP Anda</h2>
             <p style="text-align: center; font-size: 16px; color: #555;">
-            Gunakan kode OTP berikut untuk memverifikasi akun Anda:
+                Gunakan kode OTP berikut untuk memverifikasi akun Anda:
             </p>
-            <div style="text-align: center; font-size: 24px; font-weight: bold; color: #007bff; padding: 10px; border-radius: 8px; background-color: #f4f4f4; display: inline-block; margin: 10px auto;">
-            ${otp}
+            
+            <div style="display: flex; justify-content: center; ">
+                <div style="text-align: center; font-size: 24px; font-weight: bold; color: #007bff; padding: 4px 20px; border-radius: 8px; background-color: #f4f4f4; display: block; margin: auto; border: 2px solid #007bff; letter-spacing: 5px;">
+                    ${otp}
+                </div>
             </div>
+
             <p style="text-align: center; font-size: 14px; color: #777;">
-            Kode ini berlaku selama <strong>5 menit</strong>. Jangan berikan kode ini kepada siapapun.
+                Kode ini berlaku selama <strong>5 menit</strong>. Jangan berikan kode ini kepada siapapun.
             </p>
             <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
             <p style="text-align: center; font-size: 12px; color: #999;">
-            Jika Anda tidak meminta kode ini, silakan abaikan email ini.
+                Jika Anda tidak meminta kode ini, silakan abaikan email ini.
             </p>
-        </div>`
+        </div>
+`
     }
 
     try {

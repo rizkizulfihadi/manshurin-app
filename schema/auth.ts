@@ -26,3 +26,12 @@ export const RegisterSchema = z.object({
     path: ["confirmPassword"],
     message: "Password tidak sama"
 })
+
+export const OtpVerifySchema = z.object({
+    otp: z
+    .string()
+    .min(6, "OTP harus 6 karakter")
+    .max(6, "OTP harus 6 karakter"),
+    email: z
+    .string().email("Email tidak valid"),
+  })
