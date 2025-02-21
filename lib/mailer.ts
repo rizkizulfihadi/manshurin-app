@@ -54,7 +54,7 @@ export const sendOtp = async (email: string, otp: string) => {
 
 
 export const sendResetEmail = async (email: string, token: string) => {
-    const resetLink = `${process.env.NEXT_PUBLIC_API_URL}/auth/new-password?token=${token}`
+    const resetLink = `${process.env.NEXT_PUBLIC_API_URL}/auth/reset-password?token=${token}`
     const mailOptions = {
         from : process.env.EMAIL_USER,
         to: email,

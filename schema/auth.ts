@@ -34,4 +34,24 @@ export const OtpVerifySchema = z.object({
     .max(6, "OTP harus 6 karakter"),
     email: z
     .string().email("Email tidak valid"),
-  })
+})
+
+export const EmailSchema = z.object({
+  email: z.string().email("Email tidak valid"),
+})
+  
+
+export const ResetPasswordSchema = z.object({
+  email: z.string(),
+  password: z
+    .string()
+    .min(8,  "Password minimal 8 karakter" )
+    .max(32, "Password maksimal 32 karakter" )
+    .regex(regexPassword, "Password harus mengandung setidaknya satu huruf dan satu angka"),
+    confirmPassword: z
+    .string()
+    .min(1, "Konfirmasi password diperlukan")
+}).refine((data) => data.password === data.confirmPassword, {
+  path: ["confirmPassword"],
+  message: "Password tidak sama"
+})
