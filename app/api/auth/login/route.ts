@@ -51,13 +51,41 @@ export async function POST (req: NextRequest) {
             )
         }
 
-
         if(user.otpVerified === false){
+
+            // if the OTP request has been requested 5 times
+            const existingOtp = await db.otp.findUnique({
+                where: { userId: user.id }
+            })
+
+            if(existingOtp){
+                // get time now and time when otp created
+                const now = new Date()
+                const otpCreated = new Date(existingOtp.createdAt)
+
+                // count different time 
+                const timeDiff = now.getTime() - otpCreated.getTime();
+                const oneDay = 25 * 60 * 60 * 1000 // one day
+
+                if(timeDiff < oneDay && existingOtp.requestCount >= 5){
+                    return NextResponse.json(
+                        {
+                            status: "error",
+                            message: "Terlalu banyak permintaan OTP, coba lagi besok"
+                        }, { status: 429 }
+                    )
+                }
+            }
+
             const otp = generateOtp()
-            const saveOtp = await db.otp.create({
-                data: {
-                    code: otp,
-                    userId: user.id
+            const saveOtp = await db.otp.upsert({
+                where: { userId: user.id },
+                update: {
+                    code: otp.hashOtp,
+                },
+                create: {
+                    userId: user.id,
+                    code: otp.hashOtp
                 }
             })
 
@@ -70,12 +98,18 @@ export async function POST (req: NextRequest) {
                     }, { status: 500 }
                 )
             }
-
+            
             // send otp in email
-            sendOtp(email, otp)
+            sendOtp(email, otp.code)
 
             // redirect response
-            const response =  NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_API_URL}/auth/verify-otp`, req.url), 303);
+            const response =  NextResponse.json(
+                {
+                    status: "redirect",
+                    message: "OTP belum diverifikasi",
+                    redirectTo: `${process.env.NEXT_PUBLIC_API_URL}/auth/verify-otp`
+                }, { status: 303 }
+            )
             
             // save email in cookie
             response.cookies.set("SESSION_AUTH", email, {

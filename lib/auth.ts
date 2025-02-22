@@ -84,3 +84,24 @@ export const setAuthCookies = (response: NextResponse, token: string, refreshTok
         path: "/"
     })
 }
+
+// get time resend otp 
+export const getTimeResend = async (email: string) => {
+    const user = await db.user.findUnique({
+        where: {
+            email
+        }
+    })
+
+    const otp = await db.otp.findUnique({
+        where: { userId: user?.id }
+    })
+
+    const timeResend = otp?.requestCount 
+
+    if(timeResend === 0 ){
+        return 60   
+    }else{
+        return timeResend!! *  5 * 60 
+    }
+}

@@ -1,13 +1,11 @@
-import { totp } from "otplib"
-
-const SECRET_KEY = process.env.OTP_SECRET as string
-totp.options = { digits: 6, step: 300 }
+import crypto from "crypto"
 
 export const generateOtp = () => {
-    return totp.generate(SECRET_KEY)
+    const otp = crypto.randomInt(100000, 999999).toString();
+    const hashOtp = crypto.createHash("sha256").update(otp).digest("hex"); 
+    return { code: otp, hashOtp };
 }
 
-export const verifyOtp = (token: string): boolean => {
-    return totp.verify({  token, secret: SECRET_KEY })
-}
-
+export const verifyOtp = (otp: string, hashedOtp: string): boolean => {
+    return crypto.createHash("sha256").update(otp).digest("hex") === hashedOtp;
+};

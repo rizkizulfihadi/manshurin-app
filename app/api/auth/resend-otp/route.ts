@@ -3,7 +3,6 @@ import { sendOtp } from "@/lib/mailer";
 import { generateOtp } from "@/lib/otp";
 import { NextRequest, NextResponse } from "next/server"
 
-const OTP_EXPIRATION = 5 * 60 * 1000; 
 
 export async function POST(req: NextRequest){
     try {
@@ -43,36 +42,54 @@ export async function POST(req: NextRequest){
             )
         }
 
-        // check if otp is active
-        const lastOtp = await db.otp.findFirst({
-            where: { userId: user.id },
-            orderBy: { createdAt: "desc" }
+        const existingOtp = await db.otp.findUnique({
+            where: { userId: user.id }
         })
-
-        if(lastOtp){
-            const now = new Date()
-            const otpCreated = new Date(lastOtp.createdAt)
-            const isOtpValid = now.getTime() - otpCreated.getTime() < OTP_EXPIRATION;
-
-            if(isOtpValid){
-                return NextResponse.json(
-                    {
-                        status : "error",
-                        message: "OTP masih aktif silahkan gunakan otp yang sudah dikirim"
-                    }, { status: 400 }
-                )
-            }
+        // check if not existing otp 
+        if(!existingOtp){
+            return NextResponse.json(
+                {
+                    status: "error",
+                    message: "Unauthorized",
+                }, { status: 401 }
+            )
         }
 
+        // get time now and time when otp created
+        const now = new Date()
+        const otpCreated = new Date(existingOtp.createdAt)
+
+        // count different time 
+        const timeDiff = now.getTime() - otpCreated.getTime();
+        const oneDay = 25 * 60 * 60 * 1000 // one day
+
+        let newRequestCount = existingOtp.requestCount + 1
+
+        // if request count more then 1 day reset 
+        if(timeDiff > oneDay){
+            newRequestCount = 1
+        }else if(existingOtp.requestCount >= 5){
+            return NextResponse.json(
+                {
+                    status: "error",
+                    message: "batas resend otp sudah habis, coba lagi besok"
+                }, { status: 429 }
+            )
+        }
+
+        // create otp 
         const otp = generateOtp()
-        const saveOtp = await db.otp.create({
-            data: {
-                code: otp,
+        const saveOtp = await db.otp.update({
+            where: {
                 userId: user.id
+            },
+            data: {
+                code: otp.hashOtp,
+                requestCount: newRequestCount,
+                createdAt: now
             }
         })
 
-        // save otp in database
         if(!saveOtp){
             return NextResponse.json(
                 {
@@ -82,13 +99,13 @@ export async function POST(req: NextRequest){
             )
         }
 
-        sendOtp(email, otp)
+        sendOtp(email, otp.code)
 
         return NextResponse.json(
             {
                 status: "success",
                 message: "Otp berhasil dikirimkan silahkan cek email anda",
-                data: { otp }
+                data: { countTimer: saveOtp.requestCount }
             }, { status: 200 }
         )
 

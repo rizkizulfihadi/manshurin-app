@@ -34,9 +34,10 @@ CREATE TABLE "RefreshToken" (
 -- CreateTable
 CREATE TABLE "otp" (
     "id" TEXT NOT NULL,
-    "code" VARCHAR(6) NOT NULL,
+    "code" VARCHAR(100) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "userId" TEXT NOT NULL,
+    "requestCount" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "otp_pkey" PRIMARY KEY ("id")
 );
@@ -74,6 +75,9 @@ CREATE UNIQUE INDEX "RefreshToken_token_key" ON "RefreshToken"("token");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "RefreshToken_userId_key" ON "RefreshToken"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "otp_userId_key" ON "otp"("userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "personal_infos_userId_key" ON "personal_infos"("userId");

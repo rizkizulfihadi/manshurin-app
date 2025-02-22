@@ -39,8 +39,15 @@ export const OtpVerifySchema = z.object({
 export const EmailSchema = z.object({
   email: z.string().email("Email tidak valid"),
 })
-  
 
+
+export const OtpSchema = z.object({
+  otp: z
+    .string()
+    .min(6, "OTP harus 6 karakter")
+    .max(6, "OTP harus 6 karakter")
+})
+  
 export const ResetPasswordSchema = z.object({
   email: z.string(),
   password: z

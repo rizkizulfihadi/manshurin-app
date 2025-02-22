@@ -1,3 +1,4 @@
+import { createRefreshToken, createToken, setAuthCookies } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { verifyOtp } from "@/lib/otp";
 import { OtpVerifySchema } from "@/schema/auth";
@@ -37,12 +38,21 @@ export async function POST(req: NextRequest) {
             )
         }
 
+        // check if user has verified otp
+        if(user.otpVerified === true){
+            return NextResponse.json(
+                {
+                    status: "error",
+                    message: "Unauthorized"
+                }, { status: 401 }
+            )
+        }
+
         // check if otp exists
-        const otpExists = await db.otp.findFirst({
+        const otpExists = await db.otp.findUnique({
             where: {
                 userId: user.id,
-            },
-            orderBy: { createdAt: "desc" }
+            }
         })
 
         if(!otpExists){
@@ -54,21 +64,40 @@ export async function POST(req: NextRequest) {
             )
         }
 
+        // check if otp  expired
+        const currentTime = new Date()
+        const otpCreatedAt = new Date(otpExists.createdAt)
+        const timeDiff = (currentTime.getTime() - otpCreatedAt.getTime()) / 1000;
+
+        if (timeDiff > 300) { 
+            await db.otp.delete({
+                where: { userId: user.id }
+            });
+
+            return NextResponse.json(
+                {
+                    status: "error",
+                    message: "Kode OTP Salah atau kadaluarsa",
+                }, { status: 400 }
+            );
+        }
+
         // verifikasi otp 
-        const isValid = verifyOtp(otp)
+        const isValid = verifyOtp(otp, otpExists.code)
 
         if(!isValid){
             return NextResponse.json(
                 {
                     status: "error",
-                    message: "Kode OTP Salah atau kadaluarsa"
+                    message: "Kode OTP Salah"
                 },
                 { status: 400 }
             )
         }
+        
 
         // delete otp in database
-        await db.otp.deleteMany({
+        await db.otp.delete({
             where: { userId: user.id }
         })
 
@@ -82,12 +111,22 @@ export async function POST(req: NextRequest) {
             }
         })
 
-        return NextResponse.json(
+        const token = createToken(user)
+        const refreshToken = createRefreshToken(user)
+
+        const response = NextResponse.json(
             {
                 status: "success",
-                message: "OTP Berhasil di verifikasi "
+                message: "OTP berhasil diverifikasi",
+                data: {
+                    token, refreshToken
+                }
             }
         )
+
+        setAuthCookies(response, token, refreshToken)
+
+        return response
 
     } catch (error) {
         console.error("Error saat verifikasi OTP", error)
