@@ -17,7 +17,7 @@ const ForgotPasswordForm = () => {
 
     try {
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/reset`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/reset-request`,
         {
           method: "POST",
           headers: {

@@ -9,7 +9,7 @@ export interface RegisterForm {
     password: string;
 }
 
-export interface NewPasswordForm {
+export interface ResetPasswordForm {
     email: string;
     password: string;
     confirmPassword: string;

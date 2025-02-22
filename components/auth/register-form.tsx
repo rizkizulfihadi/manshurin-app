@@ -165,7 +165,7 @@ const RegisterForm = () => {
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Kata sandi</FormLabel>
+                      <FormLabel>Konfirmasi Kata sandi</FormLabel>
 
                       <FormControl>
                         <div className="relative">

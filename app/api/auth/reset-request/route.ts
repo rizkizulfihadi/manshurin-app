@@ -33,14 +33,14 @@ export async function POST(req: NextRequest) {
             return NextResponse.json(
                 {
                     status: "error",
-                    message: "Email tidak ditemkan"
+                    message: "Email tidak ditemukan"
                 }, { status: 404 }
             )
         }
 
         // create token for reset password
         const token = randomBytes(16).toString("hex")
-        const expiredToken = new Date(Date.now() + 1 * 60 * 60 * 1000)
+        const expiredToken = new Date(Date.now() + 15 * 60 * 1000)
         const now = new Date()
 
         const resetRequest = await db.passwordResetRequest.findUnique({
