@@ -48,7 +48,7 @@ export default function UserProfile() {
             </DropdownMenuItem>
           </Link>
           <DropdownMenuSeparator />
-          <Link href="/user/profile">
+          <Link href="/dashboard/profile">
             <DropdownMenuItem className="cursor-pointer">
               Profile
               <DropdownMenuShortcut>

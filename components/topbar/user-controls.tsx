@@ -4,7 +4,7 @@ import { LogIn } from "lucide-react";
 import UserProfile from "./user-profile";
 
 export default function UserControls() {
-  const isLoggedIn = true;
+  const isLoggedIn = false;
   return (
     <div className="flex lg:hidden order-3 md:order-3 gap-x-4 items-center">
       <GlobalSearch />

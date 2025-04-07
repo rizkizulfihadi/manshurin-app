@@ -38,7 +38,7 @@ export default function ModeToggle() {
   };
 
   return (
-    <div className="inline-flex items-center gap-x-1 rounded-full border bg-muted/50 p-1 scale-90">
+    <div className="inline-flex items-center gap-x-1 rounded-full border bg-muted/50 p-1 scale-85">
       <Button
         size="icon"
         className={`cursor-pointer rounded-full hover:bg-blue-600 hover:text-white ${

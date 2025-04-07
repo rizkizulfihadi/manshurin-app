@@ -31,7 +31,7 @@ export default function NavDesktop() {
   const isLoggedIn = true;
   return (
     <div className="hidden lg:flex gap-x-4 items-center ">
-      <ul className="flex gap-x-4">
+      <ul className="flex gap-x-3">
         {menu.map((item) => (
           <Button
             key={item.name}
@@ -39,7 +39,7 @@ export default function NavDesktop() {
             asChild
             className="rounded-full text-md"
           >
-            <Link href={item.href} className="font-semibold">
+            <Link href={item.href} className="font-semibold text-[15px]">
               {item.name}
             </Link>
           </Button>
